@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Yelp by Pictures</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_photos">Flickr Photos</string>
+    <string name="login_label">Log in</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_home_page">HomePageActivity</string>
+    <string name="choose_category">Choose a category(optional)</string>
+    <string-array name="spinner1">
+        <item >Chinese</item>
+        <item >Indian</item>
+        <item >Italian</item>    
+        <item >Mexican</item>        
+        <item >Middle Eastern</item>
+        <item >Show all results</item>        
+    </string-array>
+
+</resources>
