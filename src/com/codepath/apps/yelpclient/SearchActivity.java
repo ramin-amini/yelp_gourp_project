@@ -47,7 +47,7 @@ public class SearchActivity extends Activity {
 		    public void onLoadMore(int page, int totalItemsCount) {
 	                // Triggered only when new data needs to be appended to the list
 	                // Add whatever code is needed to append new items to your AdapterView
-		        customLoadMoreDataFromApi(page); 
+		        customLoadMoreDataFromApi(totalItemsCount); 
 	                // or customLoadMoreDataFromApi(totalItemsCount); 
 		    }
 	        });
@@ -148,6 +148,7 @@ public class SearchActivity extends Activity {
       // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
       // Deserialize API response and then construct new objects to append to the adapter
     	
+    	Log.d("test", Integer.toString(offset));
     	String location  = getIntent().getStringExtra("location");
 		String category  = getIntent().getStringExtra("category");
 		YelpClient yelpClient = YelpClientApp.getRestClient();

@@ -1,12 +1,13 @@
 package com.codepath.apps.yelpclient.listener;
 
+import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 
 public abstract class EndlessScrollListener implements OnScrollListener {
 	// The minimum amount of items to have below your current scroll position
 	// before loading more.
-	private int visibleThreshold = 5;
+	private int visibleThreshold = 18;
 	// The current offset index of data you have loaded
 	private int currentPage = 0;
 	// The total number of items in the dataset after the last load
@@ -37,7 +38,9 @@ public abstract class EndlessScrollListener implements OnScrollListener {
 		// If the total item count is zero and the previous isn't, assume the
 		// list is invalidated and should be reset back to initial state
 		// If there are no items in the list, assume that initial items are loading
+		Log.d("test", Integer.toString(firstVisibleItem)+" "+Integer.toString(totalItemCount));
 		if (!loading && (totalItemCount < previousTotalItemCount)) {
+			Log.d("test", "!load & .totalItemCount < previousTotalItemCount..");
 			this.currentPage = this.startingPageIndex;
 			this.previousTotalItemCount = totalItemCount;
 			if (totalItemCount == 0) { this.loading = true; } 
@@ -48,6 +51,7 @@ public abstract class EndlessScrollListener implements OnScrollListener {
 		// number and total item count.
 		if (loading) {
 			if (totalItemCount > previousTotalItemCount) {
+				Log.d("test", "loading & totalItemCount > previousTotalItemCount");
 				loading = false;
 				previousTotalItemCount = totalItemCount;
 				currentPage++;
@@ -58,6 +62,7 @@ public abstract class EndlessScrollListener implements OnScrollListener {
 		// the visibleThreshold and need to reload more data.
 		// If we do need to reload some more data, we execute onLoadMore to fetch the data.
 		if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+			Log.d("test", "!load & ....");
 			onLoadMore(currentPage + 1, totalItemCount);
 			loading = true;
 		}
