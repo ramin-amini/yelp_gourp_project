@@ -41,8 +41,10 @@ public class YelpClient extends OAuthBaseClient {
     	String apiUrl = getApiUrl("search");
         RequestParams params = new RequestParams();
         params.put("term", term);
-        params.put("location", location); 
-        params.put("category_filter", category);
+        params.put("location", location);
+        if(category != null){
+            params.put("category_filter", category);
+        }
         params.put("limit", limit);
         client.get(apiUrl, params, handler);        
     }

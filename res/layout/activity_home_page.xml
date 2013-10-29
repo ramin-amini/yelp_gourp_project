@@ -21,7 +21,7 @@
         android:id="@+id/btnUseMyLoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner1"
+        android:layout_below="@+id/spnrCategory"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
         android:text="Find nearby restaurants" />
@@ -36,12 +36,12 @@
         android:text="Choose a category(optional):" />
 
     <Spinner
-        android:id="@+id/spinner1"
+        android:id="@+id/spnrCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/address"
         android:layout_below="@+id/address"
-        android:entries="@array/spinner1"
+        android:entries="@array/category_array"
         android:prompt="@string/choose_category" />
 
     <TextView
