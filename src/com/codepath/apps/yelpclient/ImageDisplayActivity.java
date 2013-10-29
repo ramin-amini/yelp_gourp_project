@@ -34,8 +34,7 @@ public class ImageDisplayActivity extends Activity {
 			caption.setText("");	//we can put some text here		
 		else 
 			caption.setText(resultCaption);
-		Business info;
-		info = (Business) getIntent().getSerializableExtra("businessInfo");
+		Business info = (Business) getIntent().getSerializableExtra("businessInfo");
 		name.setText(info.getName() + "\nRating: " + info.getRating());
 		address.setText(info.getAddress() + info.getPhone());
 		//phone.setText(info.getString("phone"));
