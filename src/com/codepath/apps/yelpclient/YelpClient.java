@@ -26,8 +26,8 @@ public class YelpClient extends OAuthBaseClient {
     public static final String REST_URL = "http://api.yelp.com/v2";  
     public static final String REST_CONSUMER_KEY = "mHgbr0emfoaHxq589hQD2g";
     public static final String REST_CONSUMER_SECRET = "EmAKdvX0s-s8AMbgKG7uwgbwsqg";
-    public static final String TOKEN = "mqVeYwgUdcJdkC0p8VD9BX9o0pypp6uT";
-    public static final String TOKEN_SECRET = "7F1pT7mm2G2p7rGEsto312LU97w";
+    public static final String TOKEN = "";
+    public static final String TOKEN_SECRET = "";
     public static final String REST_CALLBACK_URL = "oauth://cpyelp";  
 
     public YelpClient(Context context) {
@@ -36,6 +36,21 @@ public class YelpClient extends OAuthBaseClient {
 
     }
 
+    /*
+     * Search api from Yelp without offset input param
+     * 
+     * @param term
+     * Search term (e.g. "food", "restaurants"). If term isn't included we search everything.
+     * 
+     * @param location
+     * Specifies the combination of "address, neighborhood, city, state or zip, optional country" to be used when searching for businesses.
+     * 
+     * @param limit
+     * Number of business results to return
+     * 
+     * @param handler
+     * handler for sending asyncHttpResponseHandler request
+     */
     public void search(String term, String location, String category, String limit, AsyncHttpResponseHandler handler) {
     	// http://api.yelp.com/v2/search?term=food&location=San+Francisco    	 
     	String apiUrl = getApiUrl("search");
@@ -47,6 +62,24 @@ public class YelpClient extends OAuthBaseClient {
         client.get(apiUrl, params, handler);        
     }
     
+    /*
+     * Search api from Yelp without offset input param
+     * 
+     * @param term
+     * Search term (e.g. "food", "restaurants"). If term isn't included we search everything.
+     * 
+     * @param location
+     * Specifies the combination of "address, neighborhood, city, state or zip, optional country" to be used when searching for businesses.
+     * 
+     * @param limit
+     * Number of business results to return
+     * 
+     * @param offset
+     * Offset the list of returned business results by this amount
+     * 
+     * @param handler
+     * handler for sending asyncHttpResponseHandler request
+     */
     public void search(String term, String location, String category, String limit, String offset, AsyncHttpResponseHandler handler) {
     	// http://api.yelp.com/v2/search?term=food&location=San+Francisco    	 
     	String apiUrl = getApiUrl("search");
