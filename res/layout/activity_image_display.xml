@@ -8,13 +8,42 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ImageDisplayActivity" >
 
+    <TextView
+        android:id="@+id/nameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="TextView"
+        android:textColor="#E00000" />
+
+    <TextView
+        android:id="@+id/captionView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"   
+        android:textSize = "10sp" 
+        android:text="TextView"
+        android:textColor="#000" />
+        
+
     <com.loopj.android.image.SmartImageView
         android:id="@+id/ivResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@+id/captionView"
+        android:layout_above="@+id/captionView"
+        android:layout_marginBottom="1dp"
+        android:maxHeight="200dp"
         android:maxWidth="600dp"
-        android:layout_alignParentTop="true"
         android:src="@android:drawable/screen_background_light" />
+
+    <TextView
+        android:id="@+id/addressView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/nameText"
+        android:layout_below="@+id/nameText"
+        android:text="TextView" />
 
 </RelativeLayout>

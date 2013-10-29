@@ -2,6 +2,7 @@ package com.codepath.apps.yelpclient;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,11 +12,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.codepath.apps.yelpclient.models.Business;
 import com.loopj.android.http.AsyncHttpClient;
@@ -23,12 +28,16 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class SearchActivity extends Activity {
+	final static String BUSINESS_PHOTOS_BASEURL = "http://www.yelp.com/biz_photos/";
+	final static String USER_PHOTOS_REGEX = "initial_photos\"\\s*:\\s*(\\[[^\\]]*\\])";;
+
 	ArrayList<ImageResult> imageResults = new ArrayList<ImageResult>();
 	ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
 
+	HashMap<String,Business> businesses;
 	ImageResultArrayAdapter imageAdapter;
 	GridView gvThumbs;
-	boolean display = false;
+	int bizCount = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,36 +47,19 @@ public class SearchActivity extends Activity {
 		
 		imageAdapter = new ImageResultArrayAdapter(this,imageResults);
 		gvThumbs.setAdapter(imageAdapter);
-		String location  = getIntent().getStringExtra("location");
-		String category  = getIntent().getStringExtra("category");
-
+ 
+		getBusinesses();
 		
-		YelpClient yelpClient = YelpClientApp.getRestClient();
-		yelpClient.search("food", location, category, new JsonHttpResponseHandler() {
+		gvThumbs.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onSuccess(int code, JSONObject body) {
-				try {
-					JSONArray businessesJson = body.getJSONArray("businesses");
-					ArrayList<Business> businesses = Business.fromJson(businessesJson);
-					// for testing purposes I'm limiting the size to 6
-					// for actual implementation use businesses.size();?
-					// or any count that is needed for scrolling
-					int loopCount = 6 ; 
-					if(businesses.size() < 6) 
-						loopCount = businesses.size();
-					for (int b=0; b<loopCount; b++){ 
-						if(b == loopCount-1) display = true;
-						findBizPhotos(businesses.get(b).getId());
-					}		
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable t) {
-				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
-			}
+			public void onItemClick(AdapterView<?> adapter, View parent, int position,
+					long rowId) {
+				Intent i = new Intent(getApplicationContext(),ImageDisplayActivity.class);
+				ImageResult imageResult = imageResults.get(position);
+				i.putExtra("result", imageResult);
+				i.putExtra("businessInfo", businesses.get(imageResult.getBizId()));
+				startActivity(i);	
+			}	
 		});
 	}
 
@@ -78,38 +70,65 @@ public class SearchActivity extends Activity {
 		return true;
 	}
 	
-	public void findBizPhotos(final String bizId){
+	public void getBusinesses(){
+		String location  = getIntent().getStringExtra("location");
+		String category  = getIntent().getStringExtra("category");	
 		allBizPhotos.clear();
 
+		YelpClient yelpClient = YelpClientApp.getRestClient();
+		yelpClient.search("food", location, category, Integer.toString(6), new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(int code, JSONObject body) {
+				try {
+					JSONArray businessesJson = body.getJSONArray("businesses");
+					businesses = Business.fromJson(businessesJson);				
+					bizCount = businesses.size();     
+					for (String key : businesses.keySet()) {
+						findBizPhotos(key);				
+					}	
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}			
+			@Override
+			public void onFailure(Throwable t) {
+				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+	
+	public void findBizPhotos(final String bizId){
 		AsyncHttpClient httpClient = new AsyncHttpClient();
- 		httpClient.get("http://www.yelp.com/biz_photos/" + bizId, new AsyncHttpResponseHandler(){
+ 		httpClient.get(BUSINESS_PHOTOS_BASEURL + bizId, new AsyncHttpResponseHandler(){
   			@Override
 			public void onSuccess(String response){
 				try {
-					ArrayList<ImageResult> allPhotosOneBiz = ImageResult.fromJsonArray(getImages(response));
-					int oneBizPhotosSize = allPhotosOneBiz.size();
-					//if no photos ignore, otherwise get only 3 photos for each business
-					if(oneBizPhotosSize > 0 ) {
-						if (oneBizPhotosSize > 3) 
-							oneBizPhotosSize = 3;
-						
-						for (int i=0; i<oneBizPhotosSize; i++){
-							allBizPhotos.add(allPhotosOneBiz.get(i));
-						}	
-						Log.d("DEBUG", "biz id  = " +bizId);
-						//Log.d("DEBUG", allPhotosOneBiz.toString());
-						//Log.d("DEBUG", allBizPhotos.toString());
-
-						imageAdapter.clear();
-						//Display the array when we have gone through the whole "for" loop
-						//This way we can shuffle the photos 
-						//otherwise we end up displaying 3 photos from the same business on each row
-						if(display){
-							long seed = System.nanoTime();
-							Collections.shuffle(allBizPhotos, new Random(seed));
-							imageAdapter.addAll(allBizPhotos);		
-						}
-					}
+					bizCount --;
+					if(response != null){
+						JSONArray bizPhotos = getImages(response, bizId);
+						if(bizPhotos != null){
+							JSONArray bizMaxThree = new JSONArray();
+							int loop = bizPhotos.length();
+							if(loop> 0){
+								if(loop > 3)  loop = 3;//get 3 photos only
+								for (int l=0; l<loop; l++){
+									JSONObject photo = (JSONObject) bizPhotos.get(l);
+									photo.put("id", bizId);
+									bizMaxThree.put(photo);
+								}
+								ArrayList<ImageResult> oneBizPhotos = ImageResult.fromJsonArray(bizMaxThree);
+								allBizPhotos.addAll(oneBizPhotos);	
+							}
+						}					
+					}						 					
+					//Display the array when we have gone through the whole "for" loop
+					//This way we can shuffle the photos 
+					//otherwise we end up displaying 3 photos from the same business on each row						
+					if(bizCount == 0){
+						long seed = System.nanoTime();
+						Collections.shuffle(allBizPhotos, new Random(seed));
+						imageAdapter.addAll(allBizPhotos);						
+					}	
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -122,14 +141,17 @@ public class SearchActivity extends Activity {
 
 	///helper method to parse html content and return initial photos using regex 
 	
-	private JSONArray getImages(String respn) throws JSONException{
-		String IMAGE_PATTERN ="initial_photos\"\\s*:\\s*(\\[[^\\]]*\\])";
-		Pattern pattern = Pattern.compile(IMAGE_PATTERN);
+	private JSONArray getImages(String respn, String bizId) {
+		Pattern pattern = Pattern.compile(USER_PHOTOS_REGEX);
 		Matcher matcher = pattern.matcher(respn);
         if(matcher.find()){
-    	   return new JSONArray(matcher.group(1));
+    	   try {
+    		   return new JSONArray(matcher.group(1));
+			} catch (JSONException e) {
+				Log.d("DEBUG", "Cound not retrieve photos from " + BUSINESS_PHOTOS_BASEURL + bizId);
+			}
         }
-       return null;
+        return null;
 	}
 
 }

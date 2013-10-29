@@ -26,8 +26,8 @@ public class YelpClient extends OAuthBaseClient {
     public static final String REST_URL = "http://api.yelp.com/v2";  
     public static final String REST_CONSUMER_KEY = "mHgbr0emfoaHxq589hQD2g";
     public static final String REST_CONSUMER_SECRET = "EmAKdvX0s-s8AMbgKG7uwgbwsqg";
-    public static final String TOKEN = "";
-    public static final String TOKEN_SECRET = "";
+    public static final String TOKEN = "mqVeYwgUdcJdkC0p8VD9BX9o0pypp6uT";
+    public static final String TOKEN_SECRET = "7F1pT7mm2G2p7rGEsto312LU97w";
     public static final String REST_CALLBACK_URL = "oauth://cpyelp";  
 
     public YelpClient(Context context) {
@@ -36,23 +36,14 @@ public class YelpClient extends OAuthBaseClient {
 
     }
 
-    public void search(String term, String location, String category, AsyncHttpResponseHandler handler) {
+    public void search(String term, String location, String category, String limit, AsyncHttpResponseHandler handler) {
     	// http://api.yelp.com/v2/search?term=food&location=San+Francisco    	 
     	String apiUrl = getApiUrl("search");
         RequestParams params = new RequestParams();
         params.put("term", term);
         params.put("location", location); 
         params.put("category_filter", category);
+        params.put("limit", limit);
         client.get(apiUrl, params, handler);        
     }
-
-
-    /* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
-     * 	  i.e getApiUrl("statuses/home_timeline.json");
-     * 2. Define the parameters to pass to the request (query or body)
-     *    i.e RequestParams params = new RequestParams("foo", "bar");
-     * 3. Define the request method and make a call to the client
-     *    i.e client.get(apiUrl, params, handler);
-     *    i.e client.post(apiUrl, params, handler);
-     */
 }
