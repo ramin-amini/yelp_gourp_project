@@ -18,10 +18,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
+import com.codepath.apps.yelpclient.listener.EndlessScrollListener;
 import com.codepath.apps.yelpclient.models.Business;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -35,6 +36,10 @@ public class SearchActivity extends Activity {
 	ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
 
 	HashMap<String,Business> businesses;
+	//we need all businesses for scrolling
+	HashMap<String,Business> allBusinesses;
+
+	
 	ImageResultArrayAdapter imageAdapter;
 	GridView gvThumbs;
 	int bizCount = 0;
@@ -44,11 +49,19 @@ public class SearchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 		gvThumbs = (GridView) findViewById(R.id.gvThumbs);
+		allBusinesses = new HashMap<String,Business>();
 		
 		imageAdapter = new ImageResultArrayAdapter(this,imageResults);
 		gvThumbs.setAdapter(imageAdapter);
  
-		getBusinesses();
+		
+		gvThumbs.setOnScrollListener(new EndlessScrollListener() {
+		    @Override
+		    public void onLoadMore(int page, int totalItemsCount) { 
+		        getBusinesses(totalItemsCount); 
+		    }
+        });
+		getBusinesses(0);
 		
 		gvThumbs.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -57,7 +70,7 @@ public class SearchActivity extends Activity {
 				Intent i = new Intent(getApplicationContext(),ImageDisplayActivity.class);
 				ImageResult imageResult = imageResults.get(position);
 				i.putExtra("result", imageResult);
-				i.putExtra("businessInfo", businesses.get(imageResult.getBizId()));
+				i.putExtra("businessInfo", allBusinesses.get(imageResult.getBizId()));
 				startActivity(i);	
 			}	
 		});
@@ -68,33 +81,6 @@ public class SearchActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.search, menu);
 		return true;
-	}
-	
-	public void getBusinesses(){
-		String location  = getIntent().getStringExtra("location");
-		String category  = getIntent().getStringExtra("category");	
-		allBizPhotos.clear();
-
-		YelpClient yelpClient = YelpClientApp.getRestClient();
-		yelpClient.search("food", location, category, Integer.toString(6), new JsonHttpResponseHandler() {
-			@Override
-			public void onSuccess(int code, JSONObject body) {
-				try {
-					JSONArray businessesJson = body.getJSONArray("businesses");
-					businesses = Business.fromJson(businessesJson);				
-					bizCount = businesses.size();     
-					for (String key : businesses.keySet()) {
-						findBizPhotos(key);				
-					}	
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}			
-			@Override
-			public void onFailure(Throwable t) {
-				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
-			}
-		});
 	}
 	
 	public void findBizPhotos(final String bizId){
@@ -120,10 +106,7 @@ public class SearchActivity extends Activity {
 								allBizPhotos.addAll(oneBizPhotos);	
 							}
 						}					
-					}						 					
-					//Display the array when we have gone through the whole "for" loop
-					//This way we can shuffle the photos 
-					//otherwise we end up displaying 3 photos from the same business on each row						
+					}						 							
 					if(bizCount == 0){
 						long seed = System.nanoTime();
 						Collections.shuffle(allBizPhotos, new Random(seed));
@@ -137,7 +120,38 @@ public class SearchActivity extends Activity {
  		});
 			
 	}
-	
+	 // Append more data into the adapter
+    //public void customLoadMoreDataFromApi(int offset) {
+    public void getBusinesses(int offset) {
+    	
+    	allBizPhotos.clear();
+    	Log.d("test", Integer.toString(offset));
+		String location  = getIntent().getStringExtra("location");
+		String category  = getIntent().getStringExtra("category");	
+
+		YelpClient yelpClient = YelpClientApp.getRestClient();
+		yelpClient.search("food", location, category, Integer.toString(6),Integer.toString(offset), new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(int code, JSONObject body) {
+				try {
+					JSONArray businessesJson = body.getJSONArray("businesses");
+					businesses = Business.fromJson(businessesJson);		
+					allBusinesses.putAll(businesses);
+					bizCount = businesses.size();     
+					for (String key : businesses.keySet()) {
+						findBizPhotos(key);
+					}	
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}			
+			@Override
+			public void onFailure(Throwable t) {
+				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
+			}
+		});
+    }
+ 
 
 	///helper method to parse html content and return initial photos using regex 
 	
@@ -153,5 +167,7 @@ public class SearchActivity extends Activity {
         }
         return null;
 	}
+	
+	
 
 }

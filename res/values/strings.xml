@@ -10,7 +10,7 @@
     <string name="title_activity_home_page">HomePageActivity</string>
     <string name="choose_category">Show all results</string>
     <string-array name="category_array">
-        <item >Show all results</item>
+        <item >food</item>
         <item >bagels</item>
         <item >bakeries</item>
         <item >beer_and_wine</item>    

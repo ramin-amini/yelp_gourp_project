@@ -45,7 +45,7 @@ public class HomePageActivity extends Activity {
 
 		Intent j = new Intent(getApplicationContext(), SearchActivity.class);
 		j.putExtra("location", query);
-		if (!getCategory().equalsIgnoreCase("Show all results")) {
+		if (!getCategory().equalsIgnoreCase("food")) {
 			j.putExtra("category", getCategory());		
 		}
 		startActivity(j);
