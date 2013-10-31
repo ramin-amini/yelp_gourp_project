@@ -57,7 +57,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.codepath.apps.yelpclient.ImageDisplayActivity"
+            android:name="com.codepath.apps.yelpclient.ImageViewActivity"
             android:label="BusinessInformation" >
                         <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

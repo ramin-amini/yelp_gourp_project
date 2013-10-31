@@ -9,7 +9,7 @@ import android.app.Activity;
 import android.view.Menu;
 import android.widget.TextView;
 
-public class ImageDisplayActivity extends Activity {
+public class ImageViewActivity extends Activity {
 	TextView name; 
 	TextView caption; 
 	TextView address;
@@ -19,7 +19,7 @@ public class ImageDisplayActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_image_display);
+		setContentView(R.layout.activity_image_view);
 		
 		ImageResult result = (ImageResult) getIntent().getSerializableExtra("result");
 		SmartImageView ivImage = (SmartImageView) findViewById(R.id.ivResult);
@@ -43,7 +43,7 @@ public class ImageDisplayActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.image_display, menu);
+		getMenuInflater().inflate(R.menu.image_view, menu);
 		return true;
 	}
 }

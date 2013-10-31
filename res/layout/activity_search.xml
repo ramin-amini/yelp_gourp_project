@@ -8,15 +8,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ThumbsDisplayActivity" >
 
-    <GridView
-        android:id="@+id/gvThumbs"
-        android:layout_width="match_parent"
+    <fragment
+        android:id="@+id/fragmentImagesList"
+        android:name="com.codepath.apps.yelpclient.fragments.ImagesListFragment"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:verticalSpacing="2dp"
-    	android:horizontalSpacing="2dp"
-        android:numColumns="3" >
-    </GridView>
+        tools:layout="@layout/fragment_images_list" />
 
 </RelativeLayout>
