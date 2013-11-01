@@ -59,6 +59,7 @@
         android:layout_below="@+id/nameText"
         android:layout_toLeftOf="@+id/btnSearch"
         android:ems="10"
-        android:focusable="true" />
+        android:focusable="true"
+        android:hint="Current Location" />
 
 </RelativeLayout>
