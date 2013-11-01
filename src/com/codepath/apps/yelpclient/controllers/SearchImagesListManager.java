@@ -24,22 +24,30 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class DefaultImagesListManager {
+public class SearchImagesListManager implements IImagesListManager{
 	private static final String TAG = "DefaultImagesListManager";
 	
 	final static String BUSINESS_PHOTOS_BASEURL = "http://www.yelp.com/biz_photos/";
 	final static String USER_PHOTOS_REGEX = "initial_photos\"\\s*:\\s*(\\[[^\\]]*\\])";
 
-	public static HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
-	private static HashMap<String,Business> businesses;
-	private static int bizCount = 0;
-	private static ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+	HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
+	private  HashMap<String,Business> businesses;
+	private  int bizCount = 0;
+	private  ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
 	
+	private  ImageResultArrayAdapter imageAdapter;
 	
+	public SearchImagesListManager( ImageResultArrayAdapter pImageAdapter){
+		imageAdapter = pImageAdapter;
+	}
+	
+	public HashMap<String, Business> getAllBusinesses() {
+		return allBusinesses;
+	}
 
-	 // Append more data into the adapter
+	// Append more data into the adapter
     //public void customLoadMoreDataFromApi(int offset) {
-    public static void getBusinesses(final FragmentActivity pActivity, int offset, final ImageResultArrayAdapter imageAdapter) {
+    public  void getBusinesses(final FragmentActivity pActivity, int offset) {
     	
     	allBizPhotos.clear();
     	Log.d("test", Integer.toString(offset));
@@ -56,7 +64,7 @@ public class DefaultImagesListManager {
 					allBusinesses.putAll(businesses);
 					bizCount = businesses.size();     
 					for (String key : businesses.keySet()) {
-						findBizPhotos(key, imageAdapter);
+						findBizPhotos(key);
 					}	
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -69,7 +77,7 @@ public class DefaultImagesListManager {
 		});
     }
     
-    private static void findBizPhotos(final String bizId, final ImageResultArrayAdapter imageAdapter){
+    private  void findBizPhotos(final String bizId){
 		AsyncHttpClient httpClient = new AsyncHttpClient();
  		httpClient.get(BUSINESS_PHOTOS_BASEURL + bizId, new AsyncHttpResponseHandler(){
   			@Override
@@ -111,7 +119,7 @@ public class DefaultImagesListManager {
 	/*
 	 * helper method to parse html content and return initial photos using regex 
 	 */	
-	private static JSONArray getImages(String respn, String bizId) {
+	private  JSONArray getImages(String respn, String bizId) {
 		Pattern pattern = Pattern.compile(USER_PHOTOS_REGEX);
 		Matcher matcher = pattern.matcher(respn);
         if(matcher.find()){
