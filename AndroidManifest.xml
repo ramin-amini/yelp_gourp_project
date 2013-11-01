@@ -8,9 +8,7 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="17" />
     
-    
-    
-      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -24,7 +22,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+	<uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name="com.codepath.apps.yelpclient.YelpClientApp"
@@ -74,12 +72,11 @@
         <activity
             android:name="com.codepath.apps.yelpclient.ImageViewActivity"
             android:label="BusinessInformation" >
-                        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
