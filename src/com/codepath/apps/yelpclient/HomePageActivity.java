@@ -143,8 +143,8 @@ public class HomePageActivity extends Activity {
 
 	public void goToRestaurant(String query) {
         // TODO Auto-generated method stub
-	    Toast.makeText(this, "Searching for yelp photos in " + query,
-                Toast.LENGTH_SHORT).show();
+//	    Toast.makeText(this, "Searching for yelp photos in " + query,
+  //              Toast.LENGTH_SHORT).show();
 
         Intent j = new Intent(getApplicationContext(), SearchActivity.class);
         j.putExtra("location", query);
