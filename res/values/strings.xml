@@ -8,14 +8,22 @@
     <string name="login_label">Log in</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_home_page">HomePageActivity</string>
-    <string name="choose_category">Choose a category(optional)</string>
-    <string-array name="spinner1">
-        <item >Chinese</item>
-        <item >Indian</item>
-        <item >Italian</item>    
-        <item >Mexican</item>        
-        <item >Middle Eastern</item>
-        <item >Show all results</item>        
+    <string name="choose_category">Show all results</string>
+    <string-array name="category_array">
+        <item >food</item>
+        <item >bagels</item>
+        <item >bakeries</item>
+        <item >beer_and_wine</item>    
+        <item >breweries</item>        
+        <item >coffee</item>
+        <item >bagels</item>   
+        <item >convenience</item> 
+        <item >desserts</item>
+        <item >diyfood</item>
+        <item >donuts</item>
+        <item >farmersmarket</item>
+        <item >fooddeliveryservices</item>
+        <item >icecream</item> 
+        <item >gourmet</item>  
     </string-array>
-
 </resources>

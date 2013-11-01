@@ -2,6 +2,7 @@ package com.codepath.apps.yelpclient;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,65 +11,56 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
+import com.codepath.apps.yelpclient.fragments.FavoriteImagesListFragment;
+import com.codepath.apps.yelpclient.fragments.SearchImagesListFragment;
+import com.codepath.apps.yelpclient.listener.EndlessScrollListener;
 import com.codepath.apps.yelpclient.models.Business;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class SearchActivity extends Activity {
-	ArrayList<ImageResult> imageResults = new ArrayList<ImageResult>();
-	ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+public class SearchActivity extends FragmentActivity implements TabListener {
 
-	ImageResultArrayAdapter imageAdapter;
-	GridView gvThumbs;
-	boolean display = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-		gvThumbs = (GridView) findViewById(R.id.gvThumbs);
-		
-		imageAdapter = new ImageResultArrayAdapter(this,imageResults);
-		gvThumbs.setAdapter(imageAdapter);
-		String location  = getIntent().getStringExtra("location");
-		String category  = getIntent().getStringExtra("category");
+		setupNavigationTabs();
+	}
 
-		
-		YelpClient yelpClient = YelpClientApp.getRestClient();
-		yelpClient.search("food", location, category, new JsonHttpResponseHandler() {
-			@Override
-			public void onSuccess(int code, JSONObject body) {
-				try {
-					JSONArray businessesJson = body.getJSONArray("businesses");
-					ArrayList<Business> businesses = Business.fromJson(businessesJson);
-					// for testing purposes I'm limiting the size to 6
-					// for actual implementation use businesses.size();?
-					// or any count that is needed for scrolling
-					int loopCount = 6 ; 
-					if(businesses.size() < 6) 
-						loopCount = businesses.size();
-					for (int b=0; b<loopCount; b++){ 
-						if(b == loopCount-1) display = true;
-						findBizPhotos(businesses.get(b).getId());
-					}		
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable t) {
-				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
-			}
-		});
+	private void setupNavigationTabs() {
+		ActionBar actionBar = getActionBar();
+    	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    	actionBar.setDisplayShowTitleEnabled(true);
+    	Tab tabSearch = actionBar.newTab().setText("Search")
+    			.setTag("SearchImagesListFragment").setIcon(R.drawable.ic_home)
+    			.setTabListener(this);
+    	
+    	Tab tabFavorite = actionBar.newTab().setText("Favorite")
+    			.setTag("FavoriteImagesListFragment").setIcon(R.drawable.ic_favorite)
+    			.setTabListener(this);
+    	
+    	actionBar.addTab(tabSearch);
+    	actionBar.addTab(tabFavorite);
+    	actionBar.selectTab(tabSearch);
 	}
 
 	@Override
@@ -77,59 +69,37 @@ public class SearchActivity extends Activity {
 		getMenuInflater().inflate(R.menu.search, menu);
 		return true;
 	}
-	
-	public void findBizPhotos(final String bizId){
-		allBizPhotos.clear();
 
-		AsyncHttpClient httpClient = new AsyncHttpClient();
- 		httpClient.get("http://www.yelp.com/biz_photos/" + bizId, new AsyncHttpResponseHandler(){
-  			@Override
-			public void onSuccess(String response){
-				try {
-					ArrayList<ImageResult> allPhotosOneBiz = ImageResult.fromJsonArray(getImages(response));
-					int oneBizPhotosSize = allPhotosOneBiz.size();
-					//if no photos ignore, otherwise get only 3 photos for each business
-					if(oneBizPhotosSize > 0 ) {
-						if (oneBizPhotosSize > 3) 
-							oneBizPhotosSize = 3;
-						
-						for (int i=0; i<oneBizPhotosSize; i++){
-							allBizPhotos.add(allPhotosOneBiz.get(i));
-						}	
-						Log.d("DEBUG", "biz id  = " +bizId);
-						//Log.d("DEBUG", allPhotosOneBiz.toString());
-						//Log.d("DEBUG", allBizPhotos.toString());
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
 
-						imageAdapter.clear();
-						//Display the array when we have gone through the whole "for" loop
-						//This way we can shuffle the photos 
-						//otherwise we end up displaying 3 photos from the same business on each row
-						if(display){
-							long seed = System.nanoTime();
-							Collections.shuffle(allBizPhotos, new Random(seed));
-							imageAdapter.addAll(allBizPhotos);		
-						}
-					}
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 			
- 			}
- 		});
-			
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		FragmentManager manager = getSupportFragmentManager() ;
+		android.support.v4.app.FragmentTransaction fts = manager.beginTransaction();
+		if(tab.getTag()=="SearchImagesListFragment"){
+			fts.replace(R.id.frame_container, new SearchImagesListFragment());
+		}
+		else{
+			fts.replace(R.id.frame_container, new FavoriteImagesListFragment());
+		}
+		fts.commit();
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 
-	///helper method to parse html content and return initial photos using regex 
+
+ 
+
 	
-	private JSONArray getImages(String respn) throws JSONException{
-		String IMAGE_PATTERN ="initial_photos\"\\s*:\\s*(\\[[^\\]]*\\])";
-		Pattern pattern = Pattern.compile(IMAGE_PATTERN);
-		Matcher matcher = pattern.matcher(respn);
-        if(matcher.find()){
-    	   return new JSONArray(matcher.group(1));
-        }
-       return null;
-	}
+	
 
 }

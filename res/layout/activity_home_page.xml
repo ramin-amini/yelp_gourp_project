@@ -21,13 +21,13 @@
         android:id="@+id/btnUseMyLoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner1"
+        android:layout_below="@+id/spnrCategory"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
         android:text="Find nearby restaurants" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/etQuery"
@@ -36,16 +36,16 @@
         android:text="Choose a category(optional):" />
 
     <Spinner
-        android:id="@+id/spinner1"
+        android:id="@+id/spnrCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/textView2"
-        android:entries="@array/spinner1"
+        android:layout_alignLeft="@+id/address"
+        android:layout_below="@+id/address"
+        android:entries="@array/category_array"
         android:prompt="@string/choose_category" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/nameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/etQuery"
@@ -56,9 +56,10 @@
         android:id="@+id/etQuery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/nameText"
         android:layout_toLeftOf="@+id/btnSearch"
         android:ems="10"
-        android:focusable="true" />
+        android:focusable="true"
+        android:hint="Current Location" />
 
 </RelativeLayout>

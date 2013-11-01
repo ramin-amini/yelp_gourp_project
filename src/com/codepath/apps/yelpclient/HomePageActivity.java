@@ -1,39 +1,58 @@
 package com.codepath.apps.yelpclient;
 
-import android.os.Bundle;
-import android.annotation.SuppressLint;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.codepath.apps.yelpclient.MyLocation.LocationResult;
+
 public class HomePageActivity extends Activity {
 	
 	EditText etQuery;
 	Button btnSearch;
-	Spinner spinner1;
-	String category = "";
+	Spinner spnrCategory;
+	boolean ll;
+	private LocationManager locationMangaer=null;  
+	private LocationListener locationListener=null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home_page);
 		setViews();
-		setSpinner();
-
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.home_page, menu);
+		locationMangaer = (LocationManager)   
+		        getSystemService(Context.LOCATION_SERVICE);
 		return true;
 	}
 	
@@ -41,48 +60,81 @@ public class HomePageActivity extends Activity {
 	public void setViews(){
 		etQuery = (EditText) findViewById(R.id.etQuery);
 		btnSearch = (Button) findViewById(R.id.btnSearch);
+		spnrCategory = (Spinner) findViewById(R.id.spnrCategory);
 	}
 	
-	public void yelpImageSearch(View v){		
+	private Boolean displayGpsStatus() {  
+	    ContentResolver contentResolver = getBaseContext()  
+	    .getContentResolver();  
+	    boolean gpsStatus = Settings.Secure  
+	    .isLocationProviderEnabled(contentResolver,   
+	    LocationManager.GPS_PROVIDER);  
+	    if (gpsStatus) {  
+	     return true;  
+	    
+	    } else {  
+	     return false;  
+	    }  
+	   }  
+	
+	public void yelpImageSearch(View v) {
 		String query = etQuery.getText().toString();
+		ll= false;
+		boolean flag = displayGpsStatus();
+			
+		if (query == null || query.isEmpty()) {
+		    
+		    LocationResult locationResult = new LocationResult(){
+		        @Override
+		        public void gotLocation(Location location) {
+		           //Log.d("prajna", location.get);
+		            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
-		Toast.makeText(this, "Searching for yelp photos in " + query , Toast.LENGTH_SHORT).show();
-
-		Intent j = new Intent(getApplicationContext(),SearchActivity.class);
-		j.putExtra("location", query );
-		j.putExtra("category", category );
-		startActivity(j);			
-		}
-
-	public void setSpinner(){
-		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-		        R.array.spinner1, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		spinner.setSelection(adapter.getPosition("Show all results"));
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-			@SuppressLint("DefaultLocale")
-			public void onItemSelected(AdapterView<?> parent,
-	            View view, int pos, long id) {
-	            //Get item from spinner and store in string category........
-	        	category = parent.getItemAtPosition(pos).toString().toLowerCase();	        	
-	            if (category.equalsIgnoreCase("Indian")){
-	            	category = "indpak"; 
-	            }	
-	            else if (category.equalsIgnoreCase("Middle Eastern")){
-	            	category = "mideastern"; 
-	            }
-	            else if (category.equalsIgnoreCase("Show all results")){
-	            	category = ""; 
-	            } 
-			}
-
-	        public void onNothingSelected(AdapterView<?> parent) {
-	          // Do nothing.
-	        }
-	        
-	    });	
+                    StrictMode.setThreadPolicy(policy); 
+		            
+                    String query1 = null;
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    if( Double.compare(longitude,Double.NaN)==0  && 
+                    		Double.compare(latitude,Double.NaN)==0){
+                    	query1 = "sunnyvale";
+                   	
+                    }
+                    else{
+                    	query1 = String.valueOf(latitude) + "," + String.valueOf(longitude);                   	
+                    }                    
+                    goToRestaurant(query1);
+		        } 
+		    };
+		
+		    MyLocation myLocation = new MyLocation();
+		    myLocation.getLocation(this, locationResult);
+		} else {
+		    goToRestaurant(query);
+		}		
 	}
 
+	public void goToRestaurant(final String query) {
+		
+	    HomePageActivity.this.runOnUiThread(new Runnable() {
+	        public void run() {
+	            Toast.makeText(HomePageActivity.this, "Searching for yelp photos in " + query,
+	                                  Toast.LENGTH_SHORT).show();
+	        }
+	    });
+        Intent j = new Intent(getApplicationContext(), SearchActivity.class);
+        if(ll)
+            j.putExtra("ll", query);
+        else
+        	j.putExtra("location", query);
+        if (!getCategory().equalsIgnoreCase("food")) {
+            j.putExtra("category", getCategory());      
+        }
+        startActivity(j);
+    }
+	public String getCategory(){
+		String category = spnrCategory.getSelectedItem().toString();
+		return category;
+	}
+	 
 }
