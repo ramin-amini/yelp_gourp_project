@@ -141,10 +141,17 @@ public class HomePageActivity extends Activity {
 		
 	}
 
-	public void goToRestaurant(String query) {
+	public void goToRestaurant(final String query) {
         // TODO Auto-generated method stub
 //	    Toast.makeText(this, "Searching for yelp photos in " + query,
   //              Toast.LENGTH_SHORT).show();
+	    
+	    HomePageActivity.this.runOnUiThread(new Runnable() {
+	        public void run() {
+	            Toast.makeText(HomePageActivity.this, "Searching for yelp photos in " + query,
+	                                  Toast.LENGTH_SHORT).show();
+	        }
+	    });
 
         Intent j = new Intent(getApplicationContext(), SearchActivity.class);
         j.putExtra("location", query);
@@ -152,8 +159,6 @@ public class HomePageActivity extends Activity {
             j.putExtra("category", getCategory());      
         }
         startActivity(j);
-
-        
     }
 	public String getCategory(){
 		String category = spnrCategory.getSelectedItem().toString();
