@@ -101,7 +101,8 @@ public class HomePageActivity extends Activity {
                    	
                     }
                     else{
-                    	query1 = String.valueOf(latitude) + "," + String.valueOf(longitude);                   	
+                    	query1 = String.valueOf(latitude) + "," + String.valueOf(longitude); 
+                    	ll =true;
                     }                    
                     goToRestaurant(query1);
 		        } 
