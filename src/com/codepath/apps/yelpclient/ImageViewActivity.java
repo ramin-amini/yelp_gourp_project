@@ -1,19 +1,32 @@
 package com.codepath.apps.yelpclient;
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.codepath.apps.yelpclient.models.Business;
 import com.loopj.android.image.SmartImageView;
-
-import android.os.Bundle;
-import android.app.Activity;
-import android.view.Menu;
-import android.widget.TextView;
 
 public class ImageViewActivity extends Activity {
 	TextView name; 
 	TextView caption; 
 	TextView address;
 	//TextView phone;
+	
 
 
 	@Override
@@ -46,4 +59,43 @@ public class ImageViewActivity extends Activity {
 		getMenuInflater().inflate(R.menu.image_view, menu);
 		return true;
 	}
+	
+	public void addToMyFavorites(View v){
+        Business biz = (Business) getIntent().getSerializableExtra("businessInfo");
+        ImageResult pic = (ImageResult) getIntent().getSerializableExtra("result");
+
+        String bizStr = "{\"id\":\"" + pic.getBizId() +"\",\"name\":\"" + biz.getName() + "\",\"display_phone\":\"" + biz.getPhone()
+                        + "\",\"location\":{\"display_address\":[\"" + biz.getAddress() +"\"]}}";
+        String picStr = "{\"id\":\"" + pic.getBizId() + "\",\"src\":\"" + pic.getThumbUrl().replace("http:", "") + "\",\"caption\":\"" + pic.getCaption() +"\"}";
+        JSONObject bizJObj;
+        JSONObject picJObj;
+        JSONArray picBiz = new JSONArray();
+		try {
+			bizJObj = new JSONObject(bizStr);
+	        picJObj = new JSONObject(picStr);
+	        
+	        picBiz.put(picJObj);
+	        picBiz.put(bizJObj);
+
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+        
+
+        PrintWriter writer;
+        File fileDir = getFilesDir();                        
+        try {
+                writer = new PrintWriter(new BufferedWriter(new FileWriter(fileDir.getPath() 
+                                + "/" + YelpConfig.MY_FAVES_FILENAME, true)));
+                writer.println(picBiz.toString());
+                writer.close();
+                Toast.makeText(this, "Added " + biz.getName() + " to My Favorites",
+                        Toast.LENGTH_SHORT).show();         
+        } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        } 
+}
 }
