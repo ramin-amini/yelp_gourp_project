@@ -43,10 +43,11 @@ public class SearchActivity extends FragmentActivity implements TabListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-		setupNavigationTabs();
+		String tab = getIntent().getStringExtra("tab");
+		setupNavigationTabs(tab);
 	}
 
-	private void setupNavigationTabs() {
+	private void setupNavigationTabs(String tab) {
 		ActionBar actionBar = getActionBar();
     	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
     	actionBar.setDisplayShowTitleEnabled(true);
@@ -60,7 +61,11 @@ public class SearchActivity extends FragmentActivity implements TabListener {
     	
     	actionBar.addTab(tabSearch);
     	actionBar.addTab(tabFavorite);
-    	actionBar.selectTab(tabSearch);
+    	if(tab.equalsIgnoreCase("favorites")){
+    		actionBar.selectTab(tabFavorite);
+    	}else{
+        	actionBar.selectTab(tabSearch);
+    	}
 	}
 
 	@Override

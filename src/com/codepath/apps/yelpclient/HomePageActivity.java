@@ -49,6 +49,7 @@ public class HomePageActivity extends FragmentActivity {
 
 		Intent j = new Intent(getApplicationContext(), SearchActivity.class);
 		j.putExtra("location", query);
+		j.putExtra("tab", "search");
 		if (!getCategory().equalsIgnoreCase("food")) {
 			j.putExtra("category", getCategory());		
 		}
@@ -62,10 +63,7 @@ public class HomePageActivity extends FragmentActivity {
 
 	public void showFavorites(View v) {        
         Intent f = new Intent(getApplicationContext(), SearchActivity.class);
-        FragmentManager manager = getSupportFragmentManager() ;
-		android.support.v4.app.FragmentTransaction fts = manager.beginTransaction();
-		fts.replace(R.id.frame_container, new FavoriteImagesListFragment());
-		fts.commit();
-        startActivity(f);
-}
+        f.putExtra("tab", "favorites");
+        startActivity(f);   
+	}
 }
