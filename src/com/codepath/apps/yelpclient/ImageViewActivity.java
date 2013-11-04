@@ -1,6 +1,16 @@
 package com.codepath.apps.yelpclient;
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.codepath.apps.yelpclient.models.Business;
 import com.loopj.android.image.SmartImageView;
 
@@ -11,13 +21,17 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ImageViewActivity extends Activity {
 	TextView name; 
 	TextView caption; 
 	TextView address;
 	TextView phone;
+	Button btnAddMyFave;
+	private static final String MY_FAVES_FILENAME = "yelp_my_faves_master.txt";
 
 
 	@Override
@@ -51,11 +65,39 @@ public class ImageViewActivity extends Activity {
 		return true;
 	}
 	
-	public void callAction(View v) {
-	    
+	public void callAction(View v) {	    
 	    Intent callIntent = new Intent(Intent.ACTION_CALL);
 	    callIntent.setData(Uri.parse("tel:"+phone.getText().toString().trim()));
 	    callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
 	    startActivity(callIntent);
+	}
+	
+	public void addToMyFavorites(View v) throws IOException, JSONException{
+		Business biz = (Business) getIntent().getSerializableExtra("businessInfo");
+		ImageResult pic = (ImageResult) getIntent().getSerializableExtra("result");
+
+		String bizStr = "{\"id\":\"" + pic.getBizId() +"\",\"name\":\"" + biz.getName() + "\",\"display_phone\":\"" + biz.getPhone()
+				+ "\",\"location\":{\"display_address\":[\"" + biz.getAddress() +"\"]}}";
+		String picStr = "{\"id\":\"" + pic.getBizId() + "\",\"src\":\"" + pic.getThumbUrl().replace("http:", "") + "\",\"caption\":\"" + pic.getCaption() +"\"}";
+		JSONObject bizJObj = new JSONObject(bizStr);
+		JSONObject picJObj = new JSONObject(picStr);
+
+		JSONArray picBiz = new JSONArray();
+		picBiz.put(picJObj);
+		picBiz.put(bizJObj);
+
+		PrintWriter writer;
+		File fileDir = getFilesDir();			
+		try {
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(fileDir.getPath() 
+					+ "/" + MY_FAVES_FILENAME, true)));
+			writer.println(picBiz.toString());
+			writer.close();
+			Toast.makeText(this, "Added " + biz.getName() + " to My Favorites",
+				Toast.LENGTH_SHORT).show();	 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 }

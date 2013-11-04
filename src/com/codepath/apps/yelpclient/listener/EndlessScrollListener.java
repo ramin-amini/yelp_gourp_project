@@ -17,6 +17,7 @@ public abstract class EndlessScrollListener implements OnScrollListener {
 	// Sets the starting page index
 	private int startingPageIndex = 0;
 
+
 	public EndlessScrollListener() {
 	}
 
@@ -29,6 +30,7 @@ public abstract class EndlessScrollListener implements OnScrollListener {
 		this.startingPageIndex = startPage;
 		this.currentPage = startPage;
 	}
+	
 
 	// This happens many times a second during a scroll, so be wary of the code you place here.
 	// We are given a few useful parameters to help us work out if we need to load some more data,

@@ -15,6 +15,6 @@ public class FavoriteImagesListFragment extends ImagesListFragment {
 
 	@Override
 	public IImagesListManager getImagesListManager() {
-		return new FavoriteImagesListManager();
+		return new FavoriteImagesListManager(getAdapter());
 	}
 }

@@ -54,7 +54,7 @@ public class SearchActivity extends FragmentActivity implements TabListener {
     			.setTag("SearchImagesListFragment").setIcon(R.drawable.ic_home)
     			.setTabListener(this);
     	
-    	Tab tabFavorite = actionBar.newTab().setText("Favorite")
+    	Tab tabFavorite = actionBar.newTab().setText("Favorites")
     			.setTag("FavoriteImagesListFragment").setIcon(R.drawable.ic_favorite)
     			.setTabListener(this);
     	

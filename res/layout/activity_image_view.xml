@@ -52,8 +52,20 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/addressView"
         android:onClick="callAction"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="4dp"
         android:clickable="true"
+        android:textColor="#0099FF"
         android:text="TextView" />
+    
+        <Button
+        android:id="@+id/btnAddFaves"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/nameText"
+        android:onClick="addToMyFavorites"
+        android:text="Add to My Faves" />
+    
 
 </RelativeLayout>

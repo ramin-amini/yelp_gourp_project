@@ -31,12 +31,11 @@ public class SearchImagesListManager implements IImagesListManager{
 	private static final String USER_PHOTOS_REGEX = "initial_photos\"\\s*:\\s*(\\[[^\\]]*\\])";
 
 	HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
-	private  HashMap<String,Business> businesses;
+	//private  HashMap<String,Business> businesses;
 	private  int bizCount = 0;
-	private  ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+	private  ArrayList<ImageResult> allBizPhotos;// = new ArrayList<ImageResult>();
 	
 	private  ImageResultArrayAdapter imageAdapter;
-	boolean ll = false;
 	
 	public SearchImagesListManager( ImageResultArrayAdapter pImageAdapter){
 		imageAdapter = pImageAdapter;
@@ -49,8 +48,9 @@ public class SearchImagesListManager implements IImagesListManager{
 	// Append more data into the adapter
     //public void customLoadMoreDataFromApi(int offset) {
     public  void getBusinesses(final FragmentActivity pActivity, int offset) {
-    	
-    	allBizPhotos.clear();
+    	boolean ll = false; // ll => latitude and longitude
+    	allBizPhotos = new ArrayList<ImageResult>();
+    	//allBizPhotos.clear();
     	Log.d("test", Integer.toString(offset));
     	String location = pActivity.getIntent().getStringExtra("ll");
     	if(location != null)
@@ -65,7 +65,7 @@ public class SearchImagesListManager implements IImagesListManager{
 			public void onSuccess(int code, JSONObject body) {
 				try {
 					JSONArray businessesJson = body.getJSONArray("businesses");
-					businesses = Business.fromJson(businessesJson);		
+					HashMap<String,Business> businesses = Business.fromJson(businessesJson);		
 					allBusinesses.putAll(businesses);
 					bizCount = businesses.size();     
 					for (String key : businesses.keySet()) {
@@ -101,8 +101,8 @@ public class SearchImagesListManager implements IImagesListManager{
 									photo.put("id", bizId);
 									bizMaxThree.put(photo);
 								}
-								ArrayList<ImageResult> oneBizPhotos = ImageResult.fromJsonArray(bizMaxThree);
-								allBizPhotos.addAll(oneBizPhotos);	
+								//ArrayList<ImageResult> oneBizPhotos = ImageResult.fromJsonArray(bizMaxThree);
+								allBizPhotos.addAll(ImageResult.fromJsonArray(bizMaxThree));	
 							}
 						}					
 					}						 							
