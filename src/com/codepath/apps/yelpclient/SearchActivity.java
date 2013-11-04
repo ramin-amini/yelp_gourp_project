@@ -1,5 +1,7 @@
 package com.codepath.apps.yelpclient;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,12 +9,14 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -72,29 +76,38 @@ public class SearchActivity extends Activity {
 	
 	public void getBusinesses(){
 		String location  = getIntent().getStringExtra("location");
-		String category  = getIntent().getStringExtra("category");	
-		allBizPhotos.clear();
-
-		YelpClient yelpClient = YelpClientApp.getRestClient();
-		yelpClient.search("food", location, category, Integer.toString(6), new JsonHttpResponseHandler() {
-			@Override
-			public void onSuccess(int code, JSONObject body) {
-				try {
-					JSONArray businessesJson = body.getJSONArray("businesses");
-					businesses = Business.fromJson(businessesJson);				
-					bizCount = businesses.size();     
-					for (String key : businesses.keySet()) {
-						findBizPhotos(key);				
-					}	
-				} catch (JSONException e) {
-					e.printStackTrace();
+		if(location.equals("mock")){
+			try {
+				readMockData();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
+		else{
+			String category  = getIntent().getStringExtra("category");	
+			allBizPhotos.clear();
+	
+			YelpClient yelpClient = YelpClientApp.getRestClient();
+			yelpClient.search("food", location, category, Integer.toString(6), new JsonHttpResponseHandler() {
+				@Override
+				public void onSuccess(int code, JSONObject body) {
+					try {
+						JSONArray businessesJson = body.getJSONArray("businesses");
+						businesses = Business.fromJson(businessesJson);				
+						bizCount = businesses.size();     
+						for (String key : businesses.keySet()) {
+							findBizPhotos(key);				
+						}	
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}			
+				@Override
+				public void onFailure(Throwable t) {
+					Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
 				}
-			}			
-			@Override
-			public void onFailure(Throwable t) {
-				Toast.makeText(SearchActivity.this, "FAIL", Toast.LENGTH_LONG).show();
-			}
-		});
+			});
+		}
 	}
 	
 	public void findBizPhotos(final String bizId){
@@ -136,6 +149,33 @@ public class SearchActivity extends Activity {
  			}
  		});
 			
+	}
+	
+	private void readMockData() throws IOException, JSONException {
+		ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+    	Resources res = getResources();
+        InputStream biz = res.openRawResource(R.raw.mock_biz_snv);
+        InputStream photos = res.openRawResource(R.raw.all_photos);      
+        try {
+	        JSONArray jsonBizAll = new JSONArray(IOUtils.toString(biz));
+			businesses = Business.fromJson(jsonBizAll);
+	        JSONArray jsonPhotosAll = new JSONArray(IOUtils.toString(photos));
+			ArrayList<ImageResult> allPhotos = ImageResult.fromJsonArray(jsonPhotosAll);
+			allBizPhotos.addAll(allPhotos);	
+
+			Toast.makeText(this, "Reading My Favorites from local storage",
+					Toast.LENGTH_SHORT).show();	  
+			long seed = System.nanoTime();
+			Collections.shuffle(allBizPhotos, new Random(seed));
+			imageAdapter.addAll(allBizPhotos);			
+
+        } catch(Exception e){
+        	e.printStackTrace();
+        }finally {
+            biz.close();
+            photos.close();
+
+        }
 	}
 	
 

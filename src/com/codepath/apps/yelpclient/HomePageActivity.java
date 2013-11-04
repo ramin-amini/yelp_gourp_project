@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 public class HomePageActivity extends Activity {
 	
@@ -38,11 +37,7 @@ public class HomePageActivity extends Activity {
 	}
 	
 	public void yelpImageSearch(View v) {
-		String query = etQuery.getText().toString();
-
-		Toast.makeText(this, "Searching for yelp photos in " + query,
-				Toast.LENGTH_SHORT).show();
-
+		String query = etQuery.getText().toString();	
 		Intent j = new Intent(getApplicationContext(), SearchActivity.class);
 		j.putExtra("location", query);
 		if (!getCategory().equalsIgnoreCase("Show all results")) {
@@ -51,6 +46,17 @@ public class HomePageActivity extends Activity {
 		startActivity(j);
 	}
 
+	public void useMockData(View v) {	
+		Intent j = new Intent(getApplicationContext(), SearchActivity.class);
+		j.putExtra("location", "mock");
+		startActivity(j);
+	}
+	
+	public void showFavorites(View v) {	
+		Intent f = new Intent(getApplicationContext(), MyFavesActivity.class);
+		startActivity(f);
+	}
+	
 	public String getCategory(){
 		String category = spnrCategory.getSelectedItem().toString();
 		return category;

@@ -1,0 +1,1 @@
+[{"src":"//s3-media3.ak.yelpcdn.com/bphoto/Vt5X8l7zTJlj8aStHyGUvg/ms.jpg","caption":"French food", "id":"cafe-beaujolais-los-angeles"},{"location": {"display_address":["1712 Colorado Blvd","Eagle Rock","Los Angeles, CA 90041"]},"id":"cafe-beaujolais-los-angeles","name":"Cafe Beaujolais","display_phone":"+1-323-255-5111","rating":4.5}]

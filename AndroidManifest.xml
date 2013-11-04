@@ -59,11 +59,15 @@
         <activity
             android:name="com.codepath.apps.yelpclient.ImageDisplayActivity"
             android:label="BusinessInformation" >
-                        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.codepath.apps.yelpclient.MyFavesActivity"
+            android:label="@string/title_activity_my_faves" >
         </activity>
     </application>
 
