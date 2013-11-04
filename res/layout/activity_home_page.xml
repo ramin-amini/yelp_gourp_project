@@ -61,4 +61,15 @@
         android:ems="10"
         android:focusable="true" />
 
+    <Button
+        android:id="@+id/btnShowFaves"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnUseMyLoc"
+        android:layout_below="@+id/btnUseMyLoc"
+        android:layout_marginTop="21dp"
+        android:onClick="showFavorites"
+        android:text="My Favorites" />
+
 </RelativeLayout>

@@ -1,8 +1,12 @@
 package com.codepath.apps.yelpclient;
 
+import com.codepath.apps.yelpclient.fragments.FavoriteImagesListFragment;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -10,7 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class HomePageActivity extends Activity {
+public class HomePageActivity extends FragmentActivity {
 	
 	EditText etQuery;
 	Button btnSearch;
@@ -56,4 +60,12 @@ public class HomePageActivity extends Activity {
 		return category;
 	}
 
+	public void showFavorites(View v) {        
+        Intent f = new Intent(getApplicationContext(), SearchActivity.class);
+        FragmentManager manager = getSupportFragmentManager() ;
+		android.support.v4.app.FragmentTransaction fts = manager.beginTransaction();
+		fts.replace(R.id.frame_container, new FavoriteImagesListFragment());
+		fts.commit();
+        startActivity(f);
+}
 }
