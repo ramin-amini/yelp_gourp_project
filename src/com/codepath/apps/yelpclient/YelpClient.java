@@ -36,12 +36,15 @@ public class YelpClient extends OAuthBaseClient {
 
     }
     
-    public void search(String term, String location, String category, String limit, String offset, AsyncHttpResponseHandler handler) {
+    public void search(String term, String location,  boolean latlong, String category, String limit, String offset, AsyncHttpResponseHandler handler) {
     	// http://api.yelp.com/v2/search?term=food&location=San+Francisco    	 
     	String apiUrl = getApiUrl("search");
         RequestParams params = new RequestParams();
         params.put("term", term);
-        params.put("location", location); 
+        if(latlong)
+            params.put("ll", location); 
+        else
+        	params.put("location", location); 
         params.put("category_filter", category);
         params.put("limit", limit);
         params.put("offset", offset);

@@ -48,14 +48,19 @@ public class SearchImagesListManager implements IImagesListManager{
 	// Append more data into the adapter
     //public void customLoadMoreDataFromApi(int offset) {
     public  void getBusinesses(final FragmentActivity pActivity, int offset) {
-    	
-    	allBizPhotos.clear();
+    	boolean ll = false; // ll => latitude and longitude
+    	allBizPhotos = new ArrayList<ImageResult>();
+    	//allBizPhotos.clear();
     	Log.d("test", Integer.toString(offset));
-		String location  = pActivity.getIntent().getStringExtra("location");
-		String category  = pActivity.getIntent().getStringExtra("category");	
+    	String location = pActivity.getIntent().getStringExtra("ll");
+    	if(location != null)
+    		ll = true;
+    	else
+    		location = pActivity.getIntent().getStringExtra("location");
+		String category = pActivity.getIntent().getStringExtra("category");	
 
 		YelpClient yelpClient = YelpClientApp.getRestClient();
-		yelpClient.search("food", location, category, Integer.toString(6),Integer.toString(offset), new JsonHttpResponseHandler() {
+		yelpClient.search("food", location, ll, category, Integer.toString(6),Integer.toString(offset), new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(int code, JSONObject body) {
 				try {
