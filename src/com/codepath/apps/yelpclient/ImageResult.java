@@ -61,7 +61,4 @@ public class ImageResult implements Serializable{
 		
 		return results;
 	}
-	
-	
-
 }

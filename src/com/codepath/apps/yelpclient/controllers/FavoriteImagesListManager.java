@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.codepath.apps.yelpclient.ImageResult;
@@ -21,8 +22,8 @@ import com.codepath.apps.yelpclient.models.Business;
 
 public class FavoriteImagesListManager implements IImagesListManager {
 
-	HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
-	ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+	//private HashMap<String,Business> allBusinesses = new HashMap<String,Business>(); 	//we need all businesses for scrolling
+	//private ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
 	private  HashMap<String,Business> businesses;
 
 	private  ImageResultArrayAdapter imageAdapter;
@@ -34,7 +35,7 @@ public class FavoriteImagesListManager implements IImagesListManager {
 	
 	@Override
 	public void getBusinesses(FragmentActivity activity, int totalItemsCount) {
-		allBizPhotos.clear();
+		//allBizPhotos.clear();
 		if(count == 0){
 			getMyFavorites(activity);
 			count++;	
@@ -44,7 +45,7 @@ public class FavoriteImagesListManager implements IImagesListManager {
 
 	@Override
 	public HashMap<String, Business> getAllBusinesses() {
-		return allBusinesses;
+		return YelpConfig.favBusinesses;
 	}
 
 	
@@ -74,13 +75,15 @@ public class FavoriteImagesListManager implements IImagesListManager {
 			businesses = Business.fromJson(jsonBizAll);
 			ArrayList<ImageResult> allPhotos = ImageResult
 					.fromJsonArray(jsonPhotosAll);
-			allBizPhotos.addAll(allPhotos);
-			allBusinesses.putAll(businesses);
+			YelpConfig.favBizPhotos.addAll(allPhotos);
+			YelpConfig.removeDuplicate(YelpConfig.favBizPhotos);
+			YelpConfig.favBusinesses.putAll(businesses);
+			Log.d("test", "Businesses"+YelpConfig.favBusinesses.size());
 			
 			Toast.makeText(pActivity,
 					"Reading My Favorites from local storage",
 					Toast.LENGTH_SHORT).show();
-			imageAdapter.addAll(allBizPhotos);
+			imageAdapter.addAll(YelpConfig.favBizPhotos);
 
 			br.close();
 		} catch (FileNotFoundException e) {

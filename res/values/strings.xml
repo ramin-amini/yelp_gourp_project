@@ -9,6 +9,8 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_home_page">HomePageActivity</string>
     <string name="choose_category">Show all results</string>
+    <string name="add_to_my_favorites">Add To My Favs</string>
+    <string name="already_my_favorites">Already My Favs</string>
     <string-array name="category_array">
         <item >food</item>
         <item >bagels</item>
