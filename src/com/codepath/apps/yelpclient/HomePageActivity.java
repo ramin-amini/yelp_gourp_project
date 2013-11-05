@@ -11,6 +11,7 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,18 @@ public class HomePageActivity extends FragmentActivity {
 		return true;
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_favorites:
+			Intent f = new Intent(getApplicationContext(), SearchActivity.class);
+		    f.putExtra("tab", "favorites");
+		    startActivity(f); 
+			return super.onOptionsItemSelected(item);
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 	
 	public void setViews(){
 		etQuery = (EditText) findViewById(R.id.etQuery);
@@ -130,9 +143,4 @@ public class HomePageActivity extends FragmentActivity {
 		return category;
 	}
 
-	public void showFavorites(View v) {        
-        Intent f = new Intent(getApplicationContext(), SearchActivity.class);
-        f.putExtra("tab", "favorites");
-        startActivity(f);   
-	}
 }

@@ -11,10 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.codepath.apps.yelpclient.HomePageActivity;
 import com.codepath.apps.yelpclient.ImageResult;
 import com.codepath.apps.yelpclient.ImageResultArrayAdapter;
 import com.codepath.apps.yelpclient.YelpClient;
@@ -55,8 +57,11 @@ public class SearchImagesListManager implements IImagesListManager{
     	String location = pActivity.getIntent().getStringExtra("ll");
     	if(location != null)
     		ll = true;
-    	else
+    	else{
     		location = pActivity.getIntent().getStringExtra("location");
+    		if(location == null) location = "94085"; //hard code for tab switch
+    	}
+    		
 		String category = pActivity.getIntent().getStringExtra("category");	
 
 		YelpClient yelpClient = YelpClientApp.getRestClient();

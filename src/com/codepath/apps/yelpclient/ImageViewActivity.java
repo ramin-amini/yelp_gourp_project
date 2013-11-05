@@ -1,25 +1,28 @@
 package com.codepath.apps.yelpclient;
 
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,13 +37,17 @@ public class ImageViewActivity extends Activity {
 	
 	TextView phone;
 
+	Button btnFavorites;
+    Business biz;
+    ImageResult result;
+    private  HashMap<String,Business> businesses;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_image_view);
 		
-		ImageResult result = (ImageResult) getIntent().getSerializableExtra("result");
+		result = (ImageResult) getIntent().getSerializableExtra("result");
 		SmartImageView ivImage = (SmartImageView) findViewById(R.id.ivResult);
 		String smImage = result.getThumbUrl();
 		ivImage.setImageUrl(smImage.substring(0,smImage.lastIndexOf("/")+1) + "l.jpg");
@@ -57,6 +64,17 @@ public class ImageViewActivity extends Activity {
 		name.setText(info.getName() + "\nRating: " + info.getRating());
 		address.setText(info.getAddress());
 	    phone.setText(info.getPhone());
+	    
+	    //check if we should enable and display the "Add" button
+        btnFavorites = (Button)findViewById(R.id.btnAddFaves);
+        readIntoMemory();
+        if( YelpConfig.favBusinesses.get(result.getBizId()) == null){
+                btnFavorites.setText(R.string.add_to_my_favorites);
+                btnFavorites.setTag("enable");
+        }else{
+                btnFavorites.setText(R.string.already_my_favorites);
+                btnFavorites.setTag("disable");
+        }
 	}
 
 	@Override
@@ -67,26 +85,26 @@ public class ImageViewActivity extends Activity {
 	}
 	
 	public void addToMyFavorites(View v){
-        Business biz = (Business) getIntent().getSerializableExtra("businessInfo");
-        ImageResult pic = (ImageResult) getIntent().getSerializableExtra("result");
+        biz = (Business) getIntent().getSerializableExtra("businessInfo");
+        if(v.getTag().equals("enable")){
+                
+        //result = (ImageResult) getIntent().getSerializableExtra("result");
 
-        String bizStr = "{\"id\":\"" + pic.getBizId() +"\",\"name\":\"" + biz.getName() + "\",\"display_phone\":\"" + biz.getPhone()
+        String bizStr = "{\"id\":\"" + result.getBizId() +"\",\"name\":\"" + biz.getName() + "\",\"display_phone\":\"" + biz.getPhone()
                         + "\",\"location\":{\"display_address\":[\"" + biz.getAddress() +"\"]}}";
-        String picStr = "{\"id\":\"" + pic.getBizId() + "\",\"src\":\"" + pic.getThumbUrl().replace("http:", "") + "\",\"caption\":\"" + pic.getCaption() +"\"}";
+        String picStr = "{\"id\":\"" + result.getBizId() + "\",\"src\":\"" + result.getThumbUrl().replace("http:", "") + "\",\"caption\":\"" + result.getCaption() +"\"}";
         JSONObject bizJObj;
         JSONObject picJObj;
         JSONArray picBiz = new JSONArray();
-		try {
-			bizJObj = new JSONObject(bizStr);
-	        picJObj = new JSONObject(picStr);
-	        
-	        picBiz.put(picJObj);
-	        picBiz.put(bizJObj);
+                try {
+                picJObj = new JSONObject(picStr);
+                bizJObj = new JSONObject(bizStr);
+                picBiz.put(picJObj);
+                picBiz.put(bizJObj);
 
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+                } catch (JSONException e) {
+                        e.printStackTrace();
+                }
 
         
 
@@ -103,7 +121,53 @@ public class ImageViewActivity extends Activity {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
         } 
-}
+        finish();
+        startActivity(getIntent());
+        }else{
+                Toast.makeText(this, "The " + biz.getName() + "has already been My Favorites",
+            Toast.LENGTH_SHORT).show();   
+        }    
+        
+	}
+	
+	
+	 private void readIntoMemory(){
+
+         File fileDir = getFilesDir();
+         
+         BufferedReader br;
+         try {
+                 br = new BufferedReader(new FileReader(fileDir.getPath() + "/"
+                                 + YelpConfig.MY_FAVES_FILENAME));
+
+                 String line = br.readLine();
+                 JSONArray jsonBizAll = new JSONArray();
+                 JSONArray jsonPhotosAll = new JSONArray();
+
+                 while (line != null) {
+                         JSONArray jsonLine = new JSONArray(line.toString());
+                         jsonBizAll.put(jsonLine.get(1));
+                         jsonPhotosAll.put(jsonLine.get(0));
+                         line = br.readLine();
+                 }
+
+                 businesses = Business.fromJson(jsonBizAll);
+                 ArrayList<ImageResult> allPhotos = ImageResult
+                                 .fromJsonArray(jsonPhotosAll);
+                 YelpConfig.favBizPhotos.addAll(allPhotos);
+                 YelpConfig.removeDuplicate(YelpConfig.favBizPhotos);
+                 YelpConfig.favBusinesses.putAll(businesses);
+                 br.close();
+         } catch (FileNotFoundException e) {
+                 e.printStackTrace();
+         } catch (IOException e) {
+                 e.printStackTrace();
+         } catch (JSONException e) {
+                 e.printStackTrace();
+         }
+         
+	 }
+	 
 	public void callAction(View v) {
 	    
 	    Intent callIntent = new Intent(Intent.ACTION_CALL);

@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.codepath.apps.yelpclient.ImageResult;
@@ -21,8 +22,8 @@ import com.codepath.apps.yelpclient.models.Business;
 
 public class FavoriteImagesListManager implements IImagesListManager {
 
-	HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
-	ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
+	//HashMap<String,Business> allBusinesses = new HashMap<String,Business>();; 	//we need all businesses for scrolling
+	//ArrayList<ImageResult> allBizPhotos = new ArrayList<ImageResult>();
 	private  HashMap<String,Business> businesses;
 
 	private  ImageResultArrayAdapter imageAdapter;
@@ -34,7 +35,7 @@ public class FavoriteImagesListManager implements IImagesListManager {
 	
 	@Override
 	public void getBusinesses(FragmentActivity activity, int totalItemsCount) {
-		allBizPhotos.clear();
+		//allBizPhotos.clear();
 		if(count == 0){
 			getMyFavorites(activity);
 			count++;	
@@ -44,52 +45,57 @@ public class FavoriteImagesListManager implements IImagesListManager {
 
 	@Override
 	public HashMap<String, Business> getAllBusinesses() {
-		return allBusinesses;
+		return YelpConfig.favBusinesses;
 	}
 
 	
-	private void getMyFavorites(final FragmentActivity pActivity){
-		 readItems(pActivity);
-	}
+    private void getMyFavorites(final FragmentActivity pActivity){
+        readItems(pActivity);
+        
+    }
 
-	private void readItems(final FragmentActivity pActivity) {
-		File fileDir = pActivity.getFilesDir();
-		
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(fileDir.getPath() + "/"
-					+ YelpConfig.MY_FAVES_FILENAME));
 
-			String line = br.readLine();
-			JSONArray jsonBizAll = new JSONArray();
-			JSONArray jsonPhotosAll = new JSONArray();
+    private void readItems(final FragmentActivity pActivity) {
+       File fileDir = pActivity.getFilesDir();
+       
+       BufferedReader br;
+       try {
+               br = new BufferedReader(new FileReader(fileDir.getPath() + "/"
+                               + YelpConfig.MY_FAVES_FILENAME));
 
-			while (line != null) {
-				JSONArray jsonLine = new JSONArray(line.toString());
-				jsonBizAll.put(jsonLine.get(1));
-				jsonPhotosAll.put(jsonLine.get(0));
-				line = br.readLine();
-			}
+               String line = br.readLine();
+               JSONArray jsonBizAll = new JSONArray();
+               JSONArray jsonPhotosAll = new JSONArray();
 
-			businesses = Business.fromJson(jsonBizAll);
-			ArrayList<ImageResult> allPhotos = ImageResult
-					.fromJsonArray(jsonPhotosAll);
-			allBizPhotos.addAll(allPhotos);
-			allBusinesses.putAll(businesses);
-			
-			Toast.makeText(pActivity,
-					"Reading My Favorites from local storage",
-					Toast.LENGTH_SHORT).show();
-			imageAdapter.addAll(allBizPhotos);
+               while (line != null) {
+                       JSONArray jsonLine = new JSONArray(line.toString());
+                       jsonBizAll.put(jsonLine.get(1));
+                       jsonPhotosAll.put(jsonLine.get(0));
+                       line = br.readLine();
+               }
 
-			br.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
+               businesses = Business.fromJson(jsonBizAll);
+               ArrayList<ImageResult> allPhotos = ImageResult
+                               .fromJsonArray(jsonPhotosAll);
+               YelpConfig.favBizPhotos.addAll(allPhotos);
+               YelpConfig.removeDuplicate(YelpConfig.favBizPhotos);
+               YelpConfig.favBusinesses.putAll(businesses);
+               Log.d("test", "Businesses"+YelpConfig.favBusinesses.size());
+               
+               Toast.makeText(pActivity,
+                               "Reading My Favorites from local storage",
+                               Toast.LENGTH_SHORT).show();
+               imageAdapter.addAll(YelpConfig.favBizPhotos);
+
+               br.close();
+       } catch (FileNotFoundException e) {
+               e.printStackTrace();
+       } catch (IOException e) {
+               e.printStackTrace();
+       } catch (JSONException e) {
+               e.printStackTrace();
+       }
+       
+    }
 
 }
