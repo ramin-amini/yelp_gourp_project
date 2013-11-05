@@ -56,4 +56,14 @@
         android:onClick="addToMyFavorites"
         android:text="Add to My Faves" />
 
+    <TextView
+        android:id="@+id/phoneNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addressView"
+        android:onClick="callAction"
+        android:layout_marginTop="24dp"
+        android:clickable="true"
+        android:text="TextView" />
+
 </RelativeLayout>
